@@ -124,8 +124,17 @@ IF( CHARM_IDLE_DETECTION )
                 LIST( APPEND CharmApplication_SRCS Idle/X11IdleDetector.cpp )
                 SET( CHARM_IDLE_DETECTION_AVAILABLE "1" CACHE INTERNAL "" )
             ELSE()
-                SET( CHARM_IDLE_DETECTION_AVAILABLE "0" CACHE INTERNAL "" )
-                MESSAGE( STATUS "Qt5: Install Xcb headers and library for Xcb idle detection." )
+                find_package(KF5IdleTime)
+                IF( KF5IdleTime_FOUND)
+                    INCLUDE_DIRECTORIES( ${KF5IdleTime_INCLUDE_DIRS} )
+                    LIST( APPEND CharmApplication_LIBS ${KF5IdleTime_LIBRARIES} )
+                    LIST( APPEND CharmApplication_SRCS Idle/Kf5IdleDetector.cpp )
+                    SET( CHARM_IDLE_DETECTION_WAYLAND "1" CACHE INTERNAL "" )
+                    SET( CHARM_IDLE_DETECTION_AVAILABLE "1" CACHE INTERNAL "" )
+                ELSE()
+                    SET( CHARM_IDLE_DETECTION_AVAILABLE "1" CACHE INTERNAL "" )
+                    MESSAGE( STATUS "Qt5: Install Xcb headers and library for Xcb idle detection." )
+                ENDIF()
             ENDIF()
         ELSE()
             FIND_PACKAGE( X11 )
@@ -178,6 +187,7 @@ TARGET_LINK_LIBRARIES(CharmApplication ${CharmApplication_LIBS}
     Qt5::Network
     Qt5::Sql
     Qt5::PrintSupport
+    KF5::IdleTime
     qt5keychain)
 
 IF (WIN32)

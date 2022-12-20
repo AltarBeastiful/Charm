@@ -29,6 +29,7 @@
 #include "MacIdleDetector.h"
 #include "WindowsIdleDetector.h"
 #include "X11IdleDetector.h"
+#include "Kf5IdleDetector.h"
 #include "ViewHelpers.h"
 
 #include "Core/Configuration.h"
@@ -49,8 +50,10 @@ IdleDetector *IdleDetector::createIdleDetector(QObject *parent)
     return new MacIdleDetector(parent);
 #elif (defined Q_OS_WIN)
     return new WindowsIdleDetector(parent);
+#elif (defined CHARM_IDLE_DETECTION_WAYLAND)
+    return new Kf5IdleDetector(parent);
 #elif (defined CHARM_IDLE_DETECTION_AVAILABLE)
-    return new X11IdleDetector(parent);
+    return new Kf5IdleDetector(parent);
 #else
     auto unavailable = new IdleDetector(parent);
     unavailable->setAvailable(false);
